@@ -1,0 +1,93 @@
+CREATE DATABASE ecommerce_ai;
+use ecommerce_ai;
+CREATE USER 'ecom_user'@'localhost' IDENTIFIED BY 'ARYan@123';
+GRANT ALL PRIVILEGES ON ecommerce_ai.* TO 'ecom_user'@'localhost';
+FLUSH PRIVILEGES;
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  address varchar(200),
+  phone varchar(15),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+select*from users;
+-- 3️⃣ PRODUCTS TABLE
+CREATE TABLE products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(100),
+    price DECIMAL(10,2) NOT NULL,
+    stock INT DEFAULT 0,
+    description TEXT,
+    image_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+select*from products;
+-- 4️⃣ ORDERS TABLE
+CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    order_status ENUM('Pending','Processing','Shipped','Delivered','Cancelled') DEFAULT 'Pending',
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+select*from orders;
+-- 5️⃣ ORDER_ITEMS TABLE (for products inside each order)
+CREATE TABLE order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT DEFAULT 1,
+    price DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- 6️⃣ RATINGS TABLE (for recommendation system)
+CREATE TABLE ratings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    product_id INT NOT NULL,
+    rating INT CHECK (rating BETWEEN 1 AND 5),
+    review TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+select*from ratings;
+-- 7️⃣ CART TABLE (temporary before order)
+CREATE TABLE cart (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT DEFAULT 1,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- 8️⃣ SAMPLE DATA INSERTS
+INSERT INTO users (name, email, password, address, phone)
+VALUES
+('Aryan Tomar', 'aryan@gmail.com', 'aryan@123', 'Noida, UP', '9876543210'),
+('Riya Sharma', 'riya@gmail.com', 'riya@123', 'Delhi', '9123456789');
+
+select*from users;
+INSERT INTO products (name, category, price, stock, description, image_url)
+VALUES
+('Wireless Earbuds', 'Electronics', 1999.99, 20, 'Bluetooth 5.3 wireless earbuds with noise cancellation.', 'earbuds.jpg'),
+('Sports Shoes', 'Footwear', 2499.50, 15, 'Lightweight running shoes for men.', 'shoes.jpg'),
+('Smart Watch', 'Electronics', 3499.00, 10, 'Fitness smartwatch with heart rate and sleep tracking.', 'watch.jpg'),
+('Denim Jacket', 'Clothing', 1799.00, 25, 'Stylish blue denim jacket for men and women.', 'jacket.jpg');
+SELECT * FROM products WHERE id=1;
+INSERT INTO ratings (user_id, product_id, rating, review)
+VALUES
+(1, 1, 5, 'Excellent sound quality!'),
+(1, 2, 4, 'Very comfortable shoes.'),
+(2, 3, 5, 'Amazing smartwatch features!'),
+(2, 4, 4, 'Nice fabric and fit.');
