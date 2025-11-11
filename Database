@@ -1,6 +1,6 @@
 CREATE DATABASE ecommerce_ai;
 use ecommerce_ai;
-CREATE USER 'ecom_user'@'localhost' IDENTIFIED BY 'ARYan@123';
+CREATE USER 'ecom_user'@'localhost' IDENTIFIED BY 'aryan@123';
 GRANT ALL PRIVILEGES ON ecommerce_ai.* TO 'ecom_user'@'localhost';
 FLUSH PRIVILEGES;
 
